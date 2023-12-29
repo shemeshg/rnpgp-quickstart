@@ -60,7 +60,57 @@ public:
             return;
         }
         load_keyrings(true);
-    };
+    }
+
+    static bool ffi_export_key(rnp_ffi_t ffi, const char *uid, bool secret, const std::string &filePath)
+    {
+        rnp_output_t keyfile = NULL;
+        rnp_key_handle_t key = NULL;
+        uint32_t flags = RNP_KEY_EXPORT_ARMORED | RNP_KEY_EXPORT_SUBKEYS;
+        char *keyid = NULL;
+        bool result = false;
+
+        /* you may search for the key via userid, keyid, fingerprint, grip */
+        if (rnp_locate_key(ffi, "keyid", uid, &key) != RNP_SUCCESS)
+        {
+            return false;
+        }
+
+        if (!key)
+        {
+            return false;
+        }
+
+        /* get key's id and build filename */
+        if (rnp_key_get_keyid(key, &keyid) != RNP_SUCCESS)
+        {
+            goto finish;
+        }
+        rnp_buffer_destroy(keyid);
+
+        /* create file output structure */
+        if (rnp_output_to_path(&keyfile, filePath.c_str()) != RNP_SUCCESS)
+        {
+            goto finish;
+        }
+
+        flags = flags | (secret ? RNP_KEY_EXPORT_SECRET : RNP_KEY_EXPORT_PUBLIC);
+        if (rnp_key_export(key, keyfile, flags) != RNP_SUCCESS)
+        {
+            goto finish;
+        }
+
+        result = true;
+    finish:
+        rnp_key_handle_destroy(key);
+        rnp_output_destroy(keyfile);
+        return result;
+    }
+
+    void exportPublicKey(const std::string &keyId, const std::string &filePath)
+    {
+        ffi_export_key(ffi, keyId.c_str(), false, filePath);
+    }
 
     void importPublicKey(const std::string &filePath, bool doTrust)
     {
