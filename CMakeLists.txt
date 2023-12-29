@@ -36,5 +36,6 @@ RnpKeys.h
 rnpcpp.hpp
 str-utils.h
 str-utils.cpp
+GpgFactoryInterface.h
 find_package_test.cpp)
 target_link_libraries(find_package_test rnp::librnp)

@@ -10,6 +10,8 @@
 #include <map>
 #include "rnpcpp.hpp"
 #include "str-utils.h"
+// #include "GpgFactoryInterface.h"
+
 #ifndef RNP_USE_STD_REGEX
 #include <regex.h>
 #else
@@ -40,7 +42,7 @@ private:
     }
 };
 
-class RnpCoreBal
+class RnpCoreBal //: public GpgFactoryInterface
 {
 public:
     ~RnpCoreBal()
@@ -60,6 +62,15 @@ public:
             return;
         }
         load_keyrings(true);
+        rnp_ffi_set_pass_provider(ffi, example_pass_provider, this);
+    }
+
+    void setCtxSigners(std::vector<std::string> signedBy)
+    {
+        if (signedBy.size() > 0)
+        {
+            signer_fingerprint = signedBy[0];
+        }
     }
 
     static bool ffi_export_key(rnp_ffi_t ffi, const char *uid, bool secret, const std::string &filePath)
@@ -217,10 +228,41 @@ public:
         return retKeys;
     }
 
+    std::function<std::string(std::string s)> passwordCallback = [&](std::string keyid)
+    {
+        std::cout << "******** " << keyid << " PASSWORD **********\n";
+        std::string pass;
+        std::cin >> pass;
+        return pass;
+    };
+
 private:
     RnpCoreParams cfg{};
     rnp_ffi_t ffi = NULL;
     int result = 1;
+    std::string signer_fingerprint;
+
+    static bool example_pass_provider(rnp_ffi_t ffi,
+                                      void *app_ctx,
+                                      rnp_key_handle_t key,
+                                      const char *pgp_context,
+                                      char buf[],
+                                      size_t buf_len)
+    {
+        // GpgFactoryInterface *libGpgFactoryRnp = static_cast<GpgFactoryInterface *>(app_ctx);
+        RnpCoreBal *libGpgFactoryRnp = static_cast<RnpCoreBal *>(app_ctx);
+        char *keyid = NULL;
+        rnp_key_get_keyid(key, &keyid);
+        std::string keyidStr{keyid};
+        keyidStr = libGpgFactoryRnp->getPrimaryKey(keyidStr);
+
+        std::string pass = libGpgFactoryRnp->passwordCallback(keyidStr);
+
+        rnp_buffer_destroy(keyid);
+
+        strncpy(buf, pass.c_str(), buf_len);
+        return true;
+    }
 
     static bool import_keys(rnp_ffi_t ffi, const std::string &path, uint32_t flags)
     {
