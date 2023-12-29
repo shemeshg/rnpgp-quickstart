@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(find_package_test VERSION 1.0)
 
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(PkgConfig REQUIRED)
@@ -36,6 +36,9 @@ RnpKeys.h
 rnpcpp.hpp
 str-utils.h
 str-utils.cpp
-GpgFactoryInterface.h
-find_package_test.cpp)
+RnpCoreParams.h 
+RnpCoreParams.cpp 
+RnpCoreBal.h 
+RnpCoreBal.cpp 
+main.cpp)
 target_link_libraries(find_package_test rnp::librnp)
