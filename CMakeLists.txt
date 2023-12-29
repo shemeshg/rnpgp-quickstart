@@ -31,5 +31,6 @@ file-utils.h
 file-utils.cpp
 str-utils.h
 str-utils.cpp
+RnpCoreDefinitions.h
 find_package_test.cpp)
 target_link_libraries(find_package_test rnp::librnp)
