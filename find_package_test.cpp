@@ -62,6 +62,15 @@ public:
         load_keyrings(true);
     };
 
+    void importPublicKey(const std::string &filePath, bool doTrust)
+    {
+        bool isSccussfull = import_keys(ffi, filePath, RNP_LOAD_SAVE_PUBLIC_KEYS);
+        if (!isSccussfull)
+        {
+            throw std::runtime_error("Could not import key");
+        }
+    }
+
     // Not Implemented
     void trustPublicKey(std::string const &keyId) {}
     std::string getPrimaryKey(std::string searchKey)
@@ -162,6 +171,30 @@ private:
     RnpCoreParams cfg{};
     rnp_ffi_t ffi = NULL;
     int result = 1;
+
+    static bool import_keys(rnp_ffi_t ffi, const std::string &path, uint32_t flags)
+    {
+        rnp_input_t input = NULL;
+        if (rnp_input_from_path(&input, path.c_str()))
+        {
+            return false;
+        }
+        bool res = !rnp_import_keys(ffi, input, flags, NULL);
+        rnp_input_destroy(input);
+        return res;
+    }
+
+    static bool import_keys(rnp_ffi_t ffi, const uint8_t *data, size_t len, uint32_t flags)
+    {
+        rnp_input_t input = NULL;
+        if (rnp_input_from_memory(&input, data, len, false))
+        {
+            return false;
+        }
+        bool res = !rnp_import_keys(ffi, input, flags, NULL);
+        rnp_input_destroy(input);
+        return res;
+    }
 
     static bool
     key_matches_string(rnpffi::Key &key, const std::string &str)
