@@ -29,3 +29,12 @@
 #define SECRING_GPG "secring.gpg"
 #define PUBRING_G10 "public-keys-v1.d"
 #define SECRING_G10 "private-keys-v1.d"
+
+typedef enum cli_search_flags_t {
+    CLI_SEARCH_SECRET = 1 << 0,     /* search secret keys only */
+    CLI_SEARCH_SUBKEYS = 1 << 1,    /* add subkeys as well */
+    CLI_SEARCH_FIRST_ONLY = 1 << 2, /* return only first key matching */
+    CLI_SEARCH_SUBKEYS_AFTER =
+      (1 << 3) | CLI_SEARCH_SUBKEYS, /* put subkeys after the primary key */
+    CLI_SEARCH_DEFAULT = 1 << 4      /* add default key if nothing found */
+} cli_search_flags_t;
