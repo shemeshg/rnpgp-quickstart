@@ -7,6 +7,7 @@
 #include "RnpCoreDefinitions.h"
 #include "RnpKeys.h"
 #include <vector>
+#include <map>
 #include "rnpcpp.hpp"
 #include "str-utils.h"
 #ifndef RNP_USE_STD_REGEX
@@ -60,6 +61,61 @@ public:
         }
         load_keyrings(true);
     };
+
+    // Not Implemented
+    void trustPublicKey(std::string const &keyId) {}
+    std::string getPrimaryKey(std::string searchKey)
+    {
+        static std::map<std::string, std::string> cashPrimaryKey;
+
+        std::map<std::string, std::string>::iterator it;
+
+        if (cashPrimaryKey.count(searchKey))
+        {
+            return cashPrimaryKey[searchKey];
+        }
+
+        std::vector<std::string> retKeys = {};
+
+        std::vector<rnp_key_handle_t> keys;
+
+        int flags = true ? CLI_SEARCH_SECRET : 0;
+        if (!keys_matching(keys, "", CLI_SEARCH_SUBKEYS_AFTER))
+        {
+            throw std::runtime_error("Key(s) not found.\n");
+        }
+
+        std::vector<std::string> ret{};
+        bool found = false;
+        for (auto key : keys)
+        {
+            char *keyid = NULL;
+            (void)rnp_key_get_keyid(key, &keyid);
+
+            bool isPrimary = false;
+            rnp_key_is_primary(key, &isPrimary);
+            if (keyid == searchKey)
+            {
+                found = true;
+            }
+            if (isPrimary)
+            {
+                ret = {keyid};
+            }
+            else
+            {
+                ret.push_back(keyid);
+            }
+            if (found)
+            {
+                cashPrimaryKey[searchKey] = ret.at(0);
+                return ret.at(0);
+            }
+
+            rnp_buffer_destroy(keyid);
+        }
+        return searchKey;
+    }
 
     std::vector<RnpKeys> listKeys(const std::string pattern, bool secret_only)
     {
@@ -257,63 +313,74 @@ private:
     }
 #endif
 
-
-static bool
-add_key_to_array(rnp_ffi_t                      ffi,
-                 std::vector<rnp_key_handle_t> &keys,
-                 rnp_key_handle_t               key,
-                 int                            flags)
-{
-    bool subkey = false;
-    bool subkeys = (flags & CLI_SEARCH_SUBKEYS_AFTER) == CLI_SEARCH_SUBKEYS_AFTER;
-    if (rnp_key_is_sub(key, &subkey)) {
-        return false;
-    }
-
-    try {
-        keys.push_back(key);
-    } catch (const std::exception &e) {
-        ERR_MSG("%s", e.what());
-        return false;
-    }
-    if (!subkeys || subkey) {
-        return true;
-    }
-
-    std::vector<rnp_key_handle_t> subs;
-    size_t                        sub_count = 0;
-    if (rnp_key_get_subkey_count(key, &sub_count)) {
-        goto error;
-    }
-
-    try {
-        for (size_t i = 0; i < sub_count; i++) {
-            rnp_key_handle_t sub_handle = NULL;
-            if (rnp_key_get_subkey_at(key, i, &sub_handle)) {
-                goto error;
-            }
-            subs.push_back(sub_handle);
+    static bool
+    add_key_to_array(rnp_ffi_t ffi,
+                     std::vector<rnp_key_handle_t> &keys,
+                     rnp_key_handle_t key,
+                     int flags)
+    {
+        bool subkey = false;
+        bool subkeys = (flags & CLI_SEARCH_SUBKEYS_AFTER) == CLI_SEARCH_SUBKEYS_AFTER;
+        if (rnp_key_is_sub(key, &subkey))
+        {
+            return false;
         }
-        std::move(subs.begin(), subs.end(), std::back_inserter(keys));
-    } catch (const std::exception &e) {
-        ERR_MSG("%s", e.what());
-        goto error;
-    }
-    return true;
-error:
-    keys.pop_back();
-    clear_key_handles(subs);
-    return false;
-}
 
-static void
-clear_key_handles(std::vector<rnp_key_handle_t> &keys)
-{
-    for (auto handle : keys) {
-        rnp_key_handle_destroy(handle);
+        try
+        {
+            keys.push_back(key);
+        }
+        catch (const std::exception &e)
+        {
+            ERR_MSG("%s", e.what());
+            return false;
+        }
+        if (!subkeys || subkey)
+        {
+            return true;
+        }
+
+        std::vector<rnp_key_handle_t> subs;
+        size_t sub_count = 0;
+        if (rnp_key_get_subkey_count(key, &sub_count))
+        {
+            goto error;
+        }
+
+        try
+        {
+            for (size_t i = 0; i < sub_count; i++)
+            {
+                rnp_key_handle_t sub_handle = NULL;
+                if (rnp_key_get_subkey_at(key, i, &sub_handle))
+                {
+                    goto error;
+                }
+                subs.push_back(sub_handle);
+            }
+            std::move(subs.begin(), subs.end(), std::back_inserter(keys));
+        }
+        catch (const std::exception &e)
+        {
+            ERR_MSG("%s", e.what());
+            goto error;
+        }
+        return true;
+    error:
+        keys.pop_back();
+        clear_key_handles(subs);
+        return false;
     }
-    keys.clear();
-}
+
+    static void
+    clear_key_handles(std::vector<rnp_key_handle_t> &keys)
+    {
+        for (auto handle : keys)
+        {
+            rnp_key_handle_destroy(handle);
+        }
+        keys.clear();
+    }
 
     static bool
     key_matches_flags(rnpffi::Key &key, int flags)
@@ -343,8 +410,8 @@ clear_key_handles(std::vector<rnp_key_handle_t> &keys)
 
     bool
     keys_matching(std::vector<rnp_key_handle_t> &keys,
-                 const std::string &str,
-                 int flags)
+                  const std::string &str,
+                  int flags)
     {
         rnpffi::FFI ffiobj(ffi, false);
 
@@ -574,8 +641,9 @@ int main(int argc, char *argv[])
 {
     printf("RNP version: %s\n", rnp_version_string());
     RnpCoreBal rbl{};
-    for (auto &k :rbl.listKeys("",false)){
-        std::cout<<k.getKeyStr()<<"\n";
+    for (auto &k : rbl.listKeys("", false))
+    {
+        std::cout << k.getKeyStr() << "\n";
     }
     return 0;
 }
