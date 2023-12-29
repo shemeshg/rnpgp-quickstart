@@ -65,6 +65,76 @@ public:
         rnp_ffi_set_pass_provider(ffi, example_pass_provider, this);
     }
 
+    void decryptFileToString(const std::string &filePath,
+                             std::string &decrypted,
+                             std::vector<std::string> &decryptedSignedBy)
+    {
+        rnp_input_t input = NULL;
+        rnp_output_t output = NULL;
+        uint8_t *buf = NULL;
+        size_t buf_len = 0;
+        if (rnp_input_from_path(&input, filePath.c_str()) != RNP_SUCCESS)
+        {
+            throw std::runtime_error("failed to create input object\n");
+        }
+
+        if (rnp_output_to_memory(&output, 0) != RNP_SUCCESS)
+        {
+            throw std::runtime_error("failed to create output object\n");
+        }
+
+        rnp_op_verify_t verify = NULL;
+
+        if (rnp_op_verify_create(&verify, ffi, input, output) != RNP_SUCCESS)
+        {
+            throw std::runtime_error("failed to create verification context\n");
+        }
+        rnp_op_verify_execute(verify);
+
+        size_t sigcount = 0;
+        if (rnp_op_verify_get_signature_count(verify, &sigcount) != RNP_SUCCESS)
+        {
+            throw std::runtime_error("failed to get signature count\n");
+        }
+        // get the decrypted message from the output structure
+        if (rnp_output_memory_get_buf(output, &buf, &buf_len, false) != RNP_SUCCESS)
+        {
+            throw std::runtime_error("LoginReq:");
+        }
+        decrypted = std::string(buf, buf + buf_len);
+        for (size_t i = 0; i < sigcount; i++)
+        {
+            rnp_op_verify_signature_t sig = NULL;
+            rnp_result_t sigstatus = RNP_SUCCESS;
+            rnp_key_handle_t key = NULL;
+            char *keyid = NULL;
+
+            if (rnp_op_verify_get_signature_at(verify, i, &sig) != RNP_SUCCESS)
+            {
+                throw std::runtime_error("failed to get signature " + std::to_string(i) + "\n");
+            }
+
+            if (rnp_op_verify_signature_get_key(sig, &key) != RNP_SUCCESS)
+            {
+                throw std::runtime_error("failed to get signature's " + std::to_string(i) + " key\n");
+            }
+
+            if (rnp_key_get_keyid(key, &keyid) != RNP_SUCCESS)
+            {
+                rnp_key_handle_destroy(key);
+                throw std::runtime_error("failed to get key id " + std::to_string(i) + "\n");
+            }
+
+            sigstatus = rnp_op_verify_signature_get_status(sig);
+            decryptedSignedBy.push_back(keyid);
+            rnp_buffer_destroy(keyid);
+            rnp_key_handle_destroy(key);
+        }
+
+        rnp_input_destroy(input);
+        rnp_output_destroy(output);
+    }
+
     void setCtxSigners(std::vector<std::string> signedBy)
     {
         if (signedBy.size() > 0)
@@ -770,5 +840,11 @@ int main(int argc, char *argv[])
     {
         std::cout << k.getKeyStr() << "\n";
     }
+
+    const std::string filePath{"/Volumes/RAM_Disk_4G/tmp/file.gpg"};
+    std::string decrypted;
+    std::vector<std::string> decryptedSignedBy;
+    rbl.decryptFileToString(filePath, decrypted, decryptedSignedBy);
+    std::cout<<"text is\n"<<decrypted<<"\n";
     return 0;
 }
