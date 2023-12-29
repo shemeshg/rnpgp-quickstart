@@ -33,12 +33,12 @@ private:
 class RnpCoreBal
 {
 public:
+    ~RnpCoreBal(){
+        rnp_ffi_destroy(ffi);
+    }
     RnpCoreBal()
     {
-        if (rnp_cfg_set_ks_info())
-        {
-            std::cout << cfg.CFG_KR_PUB_PATH << "\n";
-        } else {
+        if (!rnp_cfg_set_ks_info()){
             return;
         }
         // initialize FFI object
