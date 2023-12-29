@@ -421,7 +421,7 @@ bool RnpCoreBal::example_pass_provider(rnp_ffi_t ffi,
                                        size_t buf_len)
 {
     // GpgFactoryInterface *libGpgFactoryRnp = static_cast<GpgFactoryInterface *>(app_ctx);
-    RnpCoreBal *libGpgFactoryRnp = static_cast<RnpCoreBal *>(app_ctx);
+    RnpCoreInterface *libGpgFactoryRnp = static_cast<RnpCoreInterface *>(app_ctx);
     char *keyid = NULL;
     rnp_key_get_keyid(key, &keyid);
     std::string keyidStr{keyid};

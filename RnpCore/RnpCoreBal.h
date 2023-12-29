@@ -2,9 +2,8 @@
 
 
 #include "RnpCoreParams.h"
-
 #include "RnpKeys.h"
-
+#include "RnpCoreInterface.h"
 #include "rnpcpp.hpp"
 
 #include <rnp/rnp.h>
@@ -22,58 +21,54 @@
 #include <regex>
 #endif
 
-class RnpCoreBal 
+class RnpCoreBal: public RnpCoreInterface 
 {
 public:
     ~RnpCoreBal();
 
     RnpCoreBal();
 
+    void initPgpFactory() override {} 
+
     void decryptFileToString(const std::string &filePath,
                              std::string &decrypted,
-                             std::vector<std::string> &decryptedSignedBy);
+                             std::vector<std::string> &decryptedSignedBy) override;
 
-    void decryptFileToFile(const std::string &fromFilePath, const std::string &toFilePath);
+    void decryptFileToFile(const std::string &fromFilePath, const std::string &toFilePath) override;
 
     void encryptSignStringToFile(const std::string &inStr,
                                  const std::string &outFilePath,
                                  std::vector<std::string> encryptTo,
-                                 bool doSign);
+                                 bool doSign) override;
 
     void encryptSignFileToFile(const std::string &inFilePath,
                                const std::string &outFilePath,
                                std::vector<std::string> encryptTo,
-                               bool doSign);
+                               bool doSign) override;
 
     void reEncryptFile(std::string pathFileToReEncrypt,
                        std::vector<std::string> encryptTo,
-                       bool doSign);
+                       bool doSign) override;
 
-    void setCtxSigners(std::vector<std::string> signedBy);
+    void setCtxSigners(std::vector<std::string> signedBy) override;
 
     static bool ffi_export_key(rnp_ffi_t ffi,
                                const char *uid,
                                bool secret,
                                const std::string &filePath);
 
-    void exportPublicKey(const std::string &keyId, const std::string &filePath);
+    void exportPublicKey(const std::string &keyId, const std::string &filePath) override;
 
-    void importPublicKey(const std::string &filePath, bool doTrust);
+    void importPublicKey(const std::string &filePath, bool doTrust) override;
 
     // Not Implemented
-    void trustPublicKey(std::string const &keyId);
+    void trustPublicKey(std::string const &keyId) override;
 
-    std::string getPrimaryKey(std::string searchKey);
+    std::string getPrimaryKey(std::string searchKey) override;
 
-    std::vector<RnpKeys> listKeys(const std::string pattern, bool secret_only);
+    std::vector<RnpKeys> listKeys(const std::string pattern, bool secret_only) override;
 
-    std::function<std::string(std::string s)> passwordCallback = [&](std::string keyid)
-    {
-        std::cout << "******** " << keyid << " PASSWORD **********\n";
-        std::string pass;
-        std::cin >> pass;
-        return pass;
-    };
+
 
 private:
     RnpCoreParams cfg{};

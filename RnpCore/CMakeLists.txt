@@ -34,7 +34,7 @@ file-utils.cpp
 str-utils.h
 str-utils.cpp
 RnpCoreDefinitions.h
-RnpKeys.h
+
 rnpcpp.hpp
 str-utils.h
 str-utils.cpp
@@ -42,12 +42,14 @@ RnpCoreParams.h
 RnpCoreParams.cpp 
 RnpCoreBal.h 
 RnpCoreBal.cpp 
+export/RnpCoreInterface.h
+export/RnpKeys.h
+RnpCoreInterface.cpp
 )
 
 target_link_libraries(RnpCore rnp::librnp)
 
 target_include_directories(RnpCore PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/export
 )
 
