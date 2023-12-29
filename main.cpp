@@ -9,6 +9,13 @@
 int main(int argc, char *argv[])
 {
     auto rbl=getRnpCoreInterface();
+    rbl->setPasswordCallback([&](std::string keyid)
+    {
+        std::cout << "******** " << keyid <<" pass **********\n";
+        std::string pass;
+        std::cin>>pass;
+        return pass;
+    }    );
     std::cout<<"RNP version: " << rbl->getRnpVersionString()<<"\n";
     for (auto &k : rbl->listKeys("", false))
     {

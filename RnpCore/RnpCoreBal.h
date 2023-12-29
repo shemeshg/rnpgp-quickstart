@@ -70,7 +70,13 @@ public:
 
     std::string getRnpVersionString() override;
 
+    std::string runPasswordCallback(std::string s) override {
+        return passwordCallback(s);
+    }
 
+    void setPasswordCallback(std::function<std::string(std::string s)> func) override {
+        passwordCallback = func;
+    }
 
 private:
     RnpCoreParams cfg{};
@@ -112,4 +118,12 @@ private:
     bool load_keyring(bool secret);
 
     bool load_keyrings(bool loadsecret);
+
+    std::function<std::string(std::string s)> passwordCallback = [&](std::string keyid)
+    {
+        std::cout << "******** " << keyid <<" PASSWORD **********\n";
+        std::string pass;
+        std::cin>>pass;
+        return pass;
+    };    
 };

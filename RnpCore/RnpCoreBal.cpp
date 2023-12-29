@@ -427,7 +427,7 @@ bool RnpCoreBal::example_pass_provider(rnp_ffi_t ffi,
     std::string keyidStr{keyid};
     keyidStr = libGpgFactoryRnp->getPrimaryKey(keyidStr);
 
-    std::string pass = libGpgFactoryRnp->passwordCallback(keyidStr);
+    std::string pass = libGpgFactoryRnp->runPasswordCallback(keyidStr);
 
     rnp_buffer_destroy(keyid);
 

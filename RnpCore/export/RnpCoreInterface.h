@@ -44,13 +44,8 @@ public:
 
     virtual std::string getRnpVersionString() = 0;
 
-    std::function<std::string(std::string s)> passwordCallback = [&](std::string keyid)
-    {
-        std::cout << "******** " << keyid <<" PASSWORD **********\n";
-        std::string pass;
-        std::cin>>pass;
-        return pass;
-    };
+    virtual std::string runPasswordCallback(std::string s) = 0;
+    virtual void setPasswordCallback(std::function<std::string(std::string s)> func) = 0;
 
     virtual std::string getPrimaryKey(std::string key){
         return {};
