@@ -42,6 +42,8 @@ public:
                                bool doSign)
         = 0;
 
+    virtual std::string getRnpVersionString() = 0;
+
     std::function<std::string(std::string s)> passwordCallback = [&](std::string keyid)
     {
         std::cout << "******** " << keyid <<" PASSWORD **********\n";

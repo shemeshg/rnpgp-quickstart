@@ -8,8 +8,8 @@
 
 int main(int argc, char *argv[])
 {
-    //printf("RNP version: %s\n", rnp_version_string());
     auto rbl=getRnpCoreInterface();
+    std::cout<<"RNP version: " << rbl->getRnpVersionString()<<"\n";
     for (auto &k : rbl->listKeys("", false))
     {
         std::cout << k.getKeyStr() << "\n";

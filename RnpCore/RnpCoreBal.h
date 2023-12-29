@@ -68,6 +68,8 @@ public:
 
     std::vector<RnpKeys> listKeys(const std::string pattern, bool secret_only) override;
 
+    std::string getRnpVersionString() override;
+
 
 
 private:

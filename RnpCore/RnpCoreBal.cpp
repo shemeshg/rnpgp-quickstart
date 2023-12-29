@@ -843,3 +843,8 @@ bool RnpCoreBal::load_keyrings(bool loadsecret)
 
     return true;
 }
+
+
+std::string RnpCoreBal::getRnpVersionString() {
+    return rnp_version_string();
+}
