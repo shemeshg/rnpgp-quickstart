@@ -1,10 +1,12 @@
 #include "RnpCoreParams.h"
 #include <rnp/rnp.h>
+#include <iostream>
 
 RnpCoreParams::RnpCoreParams()
 {
     CFG_KR_PUB_FORMAT = RNP_KEYSTORE_GPG;
     CFG_KR_SEC_FORMAT = RNP_KEYSTORE_GPG;
+    CFG_HOMEDIR = getHomeFolder();
 }
 
 std::string RnpCoreParams::getHomeFolder()
@@ -14,7 +16,8 @@ std::string RnpCoreParams::getHomeFolder()
     // use the path string as needed
     return path;
 #else
-    std::string path = std::string(std::getenv("HOME")) + "/.gnupg";
+    std::string path = 
+    std::string(getenv("APPDATA")) + "/gnupg";
     return path;
 #endif
 }

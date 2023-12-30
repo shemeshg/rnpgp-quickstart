@@ -8,20 +8,22 @@
 
 int main(int argc, char *argv[])
 {
-    auto rbl=getRnpCoreInterface();
+    auto rbl = getRnpCoreInterface();
+
     rbl->setPasswordCallback([&](std::string keyid)
-    {
+                             {
         std::cout << "******** " << keyid <<" pass **********\n";
         std::string pass;
         std::cin>>pass;
-        return pass;
-    }    );
-    std::cout<<"RNP version: " << rbl->getRnpVersionString()<<"\n";
+        return pass; });
+
+    std::cout << "RNP version: " << rbl->getRnpVersionString() << "\n";
+
     for (auto &k : rbl->listKeys("", false))
     {
         std::cout << k.getKeyStr() << "\n";
     }
-
+    
     /*
     const std::string filePath{"/Volumes/RAM_Disk_4G/tmp/file.gpg"};
     std::string decrypted;

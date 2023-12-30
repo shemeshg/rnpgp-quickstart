@@ -1,6 +1,5 @@
 #include "RnpCoreDefinitions.h"
 #include <filesystem>
-
 #include <map>
 
 #include "RnpCoreBal.h"
@@ -651,7 +650,7 @@ bool RnpCoreBal::keys_matching(std::vector<rnp_key_handle_t> &keys,
 }
 
 bool RnpCoreBal::rnp_cfg_set_ks_info()
-{
+{    
     /* getting path to keyrings. If it is specified by user in 'homedir' param then it is
      * considered as the final path */
     bool defhomedir = false;

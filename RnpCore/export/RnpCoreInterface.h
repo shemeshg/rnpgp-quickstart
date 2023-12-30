@@ -3,8 +3,8 @@
 #include "RnpKeys.h"
 #include <string>
 #include <vector>
-#include <iostream>
 #include <functional>
+#include <memory>
 
 class RnpCoreInterface
 {

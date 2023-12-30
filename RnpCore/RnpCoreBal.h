@@ -10,9 +10,9 @@
 #include <rnp/rnp_err.h>
 
 #include <functional>
-#include <iostream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 
 class RnpCoreBal: public RnpCoreInterface 
