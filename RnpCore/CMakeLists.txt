@@ -25,7 +25,6 @@ add_library(Botan::Botan  INTERFACE IMPORTED)
 set_target_properties(Botan::Botan PROPERTIES INTERFACE_LINK_LIBRARIES PkgConfig::Botan)
 
 find_package(rnp REQUIRED)
-#include_directories(/usr/local/include)
 
 
 add_library(RnpCore 
