@@ -41,10 +41,17 @@ export/RnpKeys.h
 RnpCoreInterface.cpp
 )
 
-target_link_libraries(RnpCore rnp::librnp)
+target_link_libraries(RnpCore PRIVATE rnp::librnp JSON-C::JSON-C)
 
 target_include_directories(RnpCore PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/export
+)
+
+include(GNUInstallDirs)
+install(TARGETS RnpCore
+  RUNTIME
+    DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    COMPONENT cli
 )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
