@@ -29,13 +29,9 @@ find_package(rnp REQUIRED)
 
 add_library(RnpCore 
 
-str-utils.h
-str-utils.cpp
 RnpCoreDefinitions.h
 
 rnpcpp.hpp
-str-utils.h
-str-utils.cpp
 RnpCoreParams.h 
 RnpCoreParams.cpp 
 RnpCoreBal.h 
