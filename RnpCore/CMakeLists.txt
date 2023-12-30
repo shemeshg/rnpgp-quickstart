@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(PkgConfig REQUIRED)
 
+include( "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
 find_package(BZip2 REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -29,8 +31,7 @@ find_package(rnp REQUIRED)
 
 
 add_library(RnpCore 
-file-utils.h
-file-utils.cpp
+
 str-utils.h
 str-utils.cpp
 RnpCoreDefinitions.h

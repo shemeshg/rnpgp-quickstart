@@ -12,14 +12,8 @@
 #include <functional>
 #include <iostream>
 #include <string>
-#include <unistd.h>
 #include <vector>
 
-#ifndef RNP_USE_STD_REGEX
-#include <regex.h>
-#else
-#include <regex>
-#endif
 
 class RnpCoreBal: public RnpCoreInterface 
 {
@@ -96,11 +90,8 @@ private:
 
     static bool import_keys(rnp_ffi_t ffi, const uint8_t *data, size_t len, uint32_t flags);
 
-    static bool key_matches_string(rnpffi::Key &key, const std::string &str);
 
-#ifndef RNP_USE_STD_REGEX
-    static std::string cli_rnp_unescape_for_regcomp(const std::string &src);
-#endif
+
 
     static bool add_key_to_array(rnp_ffi_t ffi,
                                  std::vector<rnp_key_handle_t> &keys,
@@ -112,6 +103,7 @@ private:
     static bool key_matches_flags(rnpffi::Key &key, int flags);
 
     bool keys_matching(std::vector<rnp_key_handle_t> &keys, const std::string &str, int flags);
+    bool keys_matching(std::vector<rnp_key_handle_t> &keys,int flags);
 
     bool rnp_cfg_set_ks_info();
 
