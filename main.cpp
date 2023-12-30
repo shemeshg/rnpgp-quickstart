@@ -22,11 +22,13 @@ int main(int argc, char *argv[])
         std::cout << k.getKeyStr() << "\n";
     }
 
+    /*
     const std::string filePath{"/Volumes/RAM_Disk_4G/tmp/file.gpg"};
     std::string decrypted;
     std::vector<std::string> decryptedSignedBy;
     rbl->decryptFileToString(filePath, decrypted, decryptedSignedBy);
     std::cout << "text is\n"
               << decrypted << "\n";
+    */
     return 0;
 }

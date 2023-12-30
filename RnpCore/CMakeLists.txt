@@ -9,8 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(PkgConfig REQUIRED)
 
-include( "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
-
 find_package(BZip2 REQUIRED)
 find_package(ZLIB REQUIRED)
 

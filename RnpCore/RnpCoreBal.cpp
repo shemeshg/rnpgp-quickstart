@@ -455,7 +455,9 @@ std::vector<RnpKeys> RnpCoreBal::listKeys(const std::string pattern, bool secret
         gk.foundUsingPattern = pattern;
         gk.can_encrypt = secret_only;
         gk.validity = 0;
-        retKeys.push_back(gk);
+        if (gk.getKeyStr().find(pattern) != std::string::npos) {
+            retKeys.push_back(gk);
+        }
 
         rnp_buffer_destroy(uid_str);
         rnp_buffer_destroy(keyfp);
