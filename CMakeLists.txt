@@ -3,7 +3,7 @@ project(quicktartRnp VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-include( "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+#include( "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 add_subdirectory(RnpCore)
 
 

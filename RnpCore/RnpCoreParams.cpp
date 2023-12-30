@@ -17,7 +17,7 @@ std::string RnpCoreParams::getHomeFolder()
     return path;
 #else
     std::string path = 
-    std::string(getenv("APPDATA")) + "/gnupg";
+    std::string(getenv("HOME")) + "/.gnupg";
     return path;
 #endif
 }
