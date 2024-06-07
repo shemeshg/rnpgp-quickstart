@@ -7,25 +7,20 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-find_package(PkgConfig REQUIRED)
+include(FetchContent)
 
-find_package(BZip2 REQUIRED)
-find_package(ZLIB REQUIRED)
+FetchContent_Declare(
+  rnp
+  GIT_REPOSITORY https://github.com/rnpgp/rnp.git
+  GIT_TAG v0.17.1
+)
+FetchContent_GetProperties(rnp)
 
-pkg_check_modules(JSONC IMPORTED_TARGET json-c12)
-if(NOT JSONC_FOUND)
-    pkg_check_modules(JSONC REQUIRED IMPORTED_TARGET json-c)
-endif(NOT JSONC_FOUND)
-
-add_library(JSON-C::JSON-C INTERFACE IMPORTED)
-set_target_properties(JSON-C::JSON-C PROPERTIES INTERFACE_LINK_LIBRARIES PkgConfig::JSONC)
-
-pkg_check_modules(Botan REQUIRED IMPORTED_TARGET botan-3)
-add_library(Botan::Botan  INTERFACE IMPORTED)
-set_target_properties(Botan::Botan PROPERTIES INTERFACE_LINK_LIBRARIES PkgConfig::Botan)
-
-find_package(rnp REQUIRED)
-
+if(NOT rnp_POPULATED)
+  message(STATUS "Fetching rnp...")
+  FetchContent_Populate(rnp)
+  add_subdirectory(${rnp_SOURCE_DIR} ${rnp_BINARY_DIR})
+endif()
 
 add_library(RnpCore 
 
@@ -41,7 +36,7 @@ export/RnpKeys.h
 RnpCoreInterface.cpp
 )
 
-target_link_libraries(RnpCore PRIVATE rnp::librnp JSON-C::JSON-C)
+target_link_libraries(RnpCore PRIVATE librnp )
 
 target_include_directories(RnpCore PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/export
